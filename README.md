@@ -43,7 +43,7 @@ jobs:
       - name: 检出仓库
         uses: actions/checkout@v2
 
-      - name: 克隆 coscmd 仓库
+      - name: 执行刷新
         run: |
           git clone https://github.com/Meikoday/testme.git
           cd testme
