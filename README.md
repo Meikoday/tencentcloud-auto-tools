@@ -38,10 +38,8 @@ on:
 jobs:
   install-and-run:
     runs-on: ubuntu-latest
-    environment: tenx
+    environment: tenx #这里是环境变量
     steps:
-      - name: 检出仓库
-        uses: actions/checkout@v2
 
       - name: 执行刷新
         run: |
