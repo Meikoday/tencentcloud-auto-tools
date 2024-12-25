@@ -43,7 +43,7 @@ jobs:
 
       - name: 执行刷新
         run: |
-          git clone https://github.com/Meikoday/testme.git
+          git clone https://github.com/Meikoday/tencentcloud-auto-tools
           cd testme
           python tencentcloud_PurgePathCache.py -id ${{ secrets.SECRET_ID }} -key ${{ secrets.SECRET_KEY }}
 ```
