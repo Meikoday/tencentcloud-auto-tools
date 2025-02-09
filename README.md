@@ -1,31 +1,65 @@
 # tencentcloud-auto-tools
 一切正在测试中，文中的参数fork到自己仓库修改即可
-# 腾讯云cdn整站刷新工具
-## tencentcloud_PurgePathCache.py
-在第35行中``payload = "{\"Paths\":[\"https://www.meiko.ink/\"],\"FlushType\":\"flush\",\"UrlEncode\":false,\"Area\":\"mainland\"}"``<br/>
-    修改为自己的参数  
-    FlushType：  
-      刷新类型  
-      flush：刷新产生更新的资源  
-      delete：刷新全部资源  
-    UrlEncode：  
-      是否对中文字符进行编码后刷新  
-    Area：   
-      刷新区域  
-      无此参数时，默认刷新加速域名所在加速区域  
-      填充 mainland 时，仅刷新中国境内加速节点上缓存内容  
-      填充 overseas 时，仅刷新中国境外加速节点上缓存内容  
-      指定刷新区域时，需要与域名加速区域匹配  
-代码传入方式  
-`python tencentcloud_PurgePathCache.py -id 你的腾讯云id -key 你的腾讯云key`  
-示例：  
+# TencentCloud CDN 自动化工具
+
+## 📖 项目概述
+腾讯云CDN缓存刷新自动化工具，支持通过API快速刷新指定路径下的缓存资源。适用于CI/CD流程集成，可配合GitHub Actions实现自动化部署后刷新。
+
+## 🚀 快速开始
+
+### 环境要求
+- Python 3.6+
+- 腾讯云账号（需配置SecretId/SecretKey）
+
+### 🔧 安装方式
 ```bash
-python tencentcloud_PurgePathCache.py -id testthisisid -key testthisiskey
+git clone https://github.com/yourname/tencentcloud-auto-tools
+cd tencentcloud-auto-tools
 ```
-可使用自动化部署工具  
-列如：  
+
+### 🛠 参数配置表
+
+| 参数 | 缩写  | 必填 | 默认值 | 说明 |
+|--------------|-------|------|--------|------------------|
+| --secret_id  | -id   | ✅   | 无 | 腾讯云账户SecretID |
+| --secret_key | -key  | ✅   | 无 | 腾讯云账户SecretKey |
+| --region | -r| ❌   | 空 | 服务区域代码   |
+| --token  | -t| ❌   | 空 | 临时安全令牌   |
+
+### 📝 脚本参数配置
+
+修改 `tencentcloud_PurgePathCache.py` 第35行：
+
+```python
+payload = {
+"Paths": ["https://yourdomain.com/"],  # 替换为你的域名
+"FlushType": "flush", # 刷新类型
+"UrlEncode": False,   # 中文编码处理
+"Area": "mainland"# 加速区域配置
+}
+```
+
+#### 刷新类型说明
+- `flush`: 仅刷新更新资源
+- `delete`: 强制刷新全部资源
+
+#### 区域配置指南
+| 区域值   | 覆盖范围 |
+|----------|--------------|
+| mainland | 中国大陆节点 |
+| overseas | 海外节点 |
+| (空值)   | 默认加速区域 |
+
+### ⚡ 执行示例
 ```bash
-name: 测试部署
+python tencentcloud_PurgePathCache.py -id YOUR_ID -key YOUR_KEY
+```
+
+### 🤖 GitHub Actions 集成
+### ⚠️ 请先fork到自己仓库修改必要的```payload ```信息再运行！
+### ```SECRET_ID ```以及```SECRET_KEY ```在环境变量中设置
+```yaml
+name: 自动部署
 
 on:
   push:
@@ -43,7 +77,12 @@ jobs:
 
       - name: 执行刷新
         run: |
-          git clone https://github.com/Meikoday/tencentcloud-auto-tools
+          git clone https://github.com/Meikoday/tencentcloud-auto-tools 
           cd testme
           python tencentcloud_PurgePathCache.py -id ${{ secrets.SECRET_ID }} -key ${{ secrets.SECRET_KEY }}
 ```
+
+### 🔒 安全提醒
+- 敏感凭证必须通过 GitHub Secrets 配置
+- 建议使用子账户密钥并分配最小权限
+- 定期轮换 API 密钥
