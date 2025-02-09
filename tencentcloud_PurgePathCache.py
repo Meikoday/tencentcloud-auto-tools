@@ -12,8 +12,10 @@ if sys.version_info[0] <= 2:
 else:
     from http.client import HTTPSConnection
 
+
 def sign(key, msg):
     return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
+
 
 def main():
     parser = argparse.ArgumentParser(description="腾讯云CDN刷新工具")
@@ -32,8 +34,23 @@ def main():
     host = "cdn.tencentcloudapi.com"
     version = "2018-06-06"
     action = "PurgePathCache"
-    payload = "{\"Paths\":[\"https://www.meiko.ink/\"],\"FlushType\":\"flush\",\"UrlEncode\":false,\"Area\":\"mainland\"}"
-    params = json.loads(payload)
+
+    payload = {
+        "Paths": [
+            "https://www.meiko.ink/"
+        ],
+        "FlushType": "flush",
+        "UrlEncode": False,
+        "Area": "mainland"
+    }
+
+    # 使用 json.dumps 来格式化输出
+    formatted_payload = json.dumps(payload, indent=4, ensure_ascii=False)
+
+    # 打印出来的 payload 会更整齐可读
+    print(formatted_payload)
+
+    params = json.loads(formatted_payload)
     endpoint = "https://cdn.tencentcloudapi.com"
     algorithm = "TC3-HMAC-SHA256"
     timestamp = int(time.time())
@@ -46,7 +63,7 @@ def main():
     ct = "application/json; charset=utf-8"
     canonical_headers = "content-type:%s\nhost:%s\nx-tc-action:%s\n" % (ct, host, action.lower())
     signed_headers = "content-type;host;x-tc-action"
-    hashed_request_payload = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    hashed_request_payload = hashlib.sha256(formatted_payload.encode("utf-8")).hexdigest()
     canonical_request = (http_request_method + "\n" +
                          canonical_uri + "\n" +
                          canonical_querystring + "\n" +
@@ -90,11 +107,12 @@ def main():
 
     try:
         req = HTTPSConnection(host)
-        req.request("POST", "/", headers=headers, body=payload.encode("utf-8"))
+        req.request("POST", "/", headers=headers, body=formatted_payload.encode("utf-8"))
         resp = req.getresponse()
-        print(resp.read().decode()) #解码输出，防止乱码
+        print(resp.read().decode())  # 解码输出，防止乱码
     except Exception as err:
         print(err)
+
 
 if __name__ == "__main__":
     main()
